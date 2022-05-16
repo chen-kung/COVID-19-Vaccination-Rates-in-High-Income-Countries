@@ -1,0 +1,326 @@
+---
+title: "Vaccination Rates in High Income Countries"
+author: "Kung Chen"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars, include = FALSE}
+library(tidyverse)
+library(lubridate)
+library(formattable)
+library(gt)
+library(glue)
+```
+
+
+```{r pressure, echo=FALSE, include = FALSE}
+
+#setup
+
+
+#------------------------------------------------#
+#HIC country populations 
+
+Australia_pop <- 25693267
+Canada_pop <- 38037204
+France_pop <- 67379908	
+Germany_pop <-83160871
+Netherlands_pop <- 17441500	
+New_Zealand_pop <- 5084300
+Norway_pop <- 5379475
+Sweden_pop <- 10353442	
+Switzerland_pop <- 8636561
+UK_pop <- 67215293	
+USA_pop <- 331501080	
+
+#notes:
+
+#All numbers taken from most recent World Bank data (https://data.worldbank.org/indicator/SP.POP.TOTL)  on May 4th 2022
+
+
+#------------------------------------------------#
+#Importing
+  
+OWID <- read.csv("/Users/kchen187/Desktop/vaccinations.csv")
+
+```
+
+```{r, include = FALSE}
+#filtering to relevant countries and most recent date
+
+# OWID_new <- OWID %>%
+#   dplyr::filter(location=="Australia" | location == "Canada" | location == "France" |location == "Germany" | location == "Netherlands" |location == "New Zealand" |location == "Norway" | location == "Sweden" | location == "Switzerland" | location == "United Kingdom" | location == "United States")
+# 
+# 
+# OWID_new2 <- OWID_new %>% arrange(desc(mdy(OWID_new$date)))
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for Australia
+
+Australia <- OWID %>%
+  dplyr::filter(location=="Australia")
+
+Australia_desc <- Australia[rev(order(as.Date(Australia$date, format="%m/%d/%Y"))), ] 
+
+Australia_single <- head(Australia_desc, 1)
+
+Australia_single$population <- Australia_pop
+
+Australia_single$name <- "AUS"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for Canada
+
+Canada <- OWID %>%
+  dplyr::filter(location=="Canada")
+
+Canada_desc <- Canada[rev(order(as.Date(Canada$date, format="%m/%d/%Y"))), ] 
+
+Canada_single <- head(Canada_desc, 1)
+
+Canada_single$population <- Canada_pop
+
+Canada_single$name <- "CAN"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for France
+
+France <- OWID %>%
+  dplyr::filter(location=="France")
+
+France_desc <- France[rev(order(as.Date(France$date, format="%m/%d/%Y"))), ] 
+
+France_single <- head(France_desc, 1)
+
+France_single$population <- France_pop
+
+France_single$name <- "FRA"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for Germany
+
+Germany <- OWID %>%
+  dplyr::filter(location=="Germany")
+
+Germany_desc <- Germany[rev(order(as.Date(Germany$date, format="%m/%d/%Y"))), ] 
+
+Germany_single <- head(Germany_desc, 1)
+
+Germany_single$population <- Germany_pop
+
+Germany_single$name <- "GER"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for Netherlands
+
+Netherlands <- OWID %>%
+  dplyr::filter(location=="Netherlands")
+
+Netherlands_desc <- Netherlands[rev(order(as.Date(Netherlands$date, format="%m/%d/%Y"))), ] 
+
+Netherlands_single <- head(Netherlands_desc, 1)
+
+Netherlands_single$population <- Netherlands_pop
+
+Netherlands_single$name <- "NETH"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for New Zealand
+
+New_Zealand <- OWID %>%
+  dplyr::filter(location=="New Zealand")
+
+New_Zealand_desc <- New_Zealand[rev(order(as.Date(New_Zealand$date, format="%m/%d/%Y"))), ] 
+
+New_Zealand_single <- head(New_Zealand_desc, 1)
+
+New_Zealand_single$population <- New_Zealand_pop
+
+New_Zealand_single$name <- "NZ"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for Norway
+
+Norway <- OWID %>%
+  dplyr::filter(location=="Norway")
+
+Norway_desc <- Norway[rev(order(as.Date(Norway$date, format="%m/%d/%Y"))), ] 
+
+Norway_single <- head(Norway_desc, 1)
+
+Norway_single$population <- Norway_pop
+
+Norway_single$name <- "NOR"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for Sweden
+
+Sweden <- OWID %>%
+  dplyr::filter(location=="Sweden")
+
+Sweden_desc <- Sweden[rev(order(as.Date(Sweden$date, format="%m/%d/%Y"))), ] 
+
+Sweden_single <- head(Sweden_desc, 1)
+
+Sweden_single$population <- Sweden_pop
+
+Sweden_single$name <- "SWE"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for Switzerland
+
+Switzerland <- OWID %>%
+  dplyr::filter(location=="Switzerland")
+
+Switzerland_desc <- Switzerland[rev(order(as.Date(Switzerland$date, format="%m/%d/%Y"))), ] 
+
+Switzerland_single <- head(Switzerland_desc, 1)
+
+Switzerland_single$population <- Switzerland_pop
+
+Switzerland_single$name <- "SWIZ"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for United Kingdom (UK)
+
+UK <- OWID %>%
+  dplyr::filter(location=="United Kingdom")
+
+UK_desc <- UK[rev(order(as.Date(UK$date, format="%m/%d/%Y"))), ] 
+
+UK_single <- head(UK_desc, 1)
+
+UK_single$population <- UK_pop
+
+UK_single$name <- "UK"
+```
+
+```{r, include = FALSE}
+#Extracting Latest Data for United States (USA)
+
+USA <- OWID %>%
+  dplyr::filter(location=="United States")
+
+USA_desc <- USA[rev(order(as.Date(USA$date, format="%m/%d/%Y"))), ] 
+
+USA_single <- head(USA_desc, 1)
+
+USA_single$population <- USA_pop
+
+USA_single$name <- "US"
+```
+
+```{r, include = FALSE}
+#Appending all countries into one table
+
+country_comp <- rbind (Australia_single, Canada_single, France_single, Germany_single, Netherlands_single, New_Zealand_single, Norway_single, Sweden_single, Switzerland_single, UK_single, USA_single)
+
+#calculating vaccination rate
+
+country_comp_vax_rate <- country_comp %>%
+  mutate(vaxx_rate = ((people_fully_vaccinated)/(population))*100) %>%
+  mutate(vaxx_rate_label = round(vaxx_rate,2))
+
+```
+
+```{r, echo=FALSE}
+#visualizations
+
+#not too sure what quartz does, but the pdf was not knitting before I put this here
+
+quartz()
+
+#original hexcode colors #2E5984","US" = "#ff8300 (now go bears colors)
+
+ggplot(country_comp_vax_rate, aes (x = name, y = vaxx_rate, fill = name)) +
+  ylim(0,100) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_fill_manual(values=c("AUS" = "#003262",
+                             "CAN" = "#003262",
+                             "FRA" = "#003262",
+                             "GER" = "#003262",
+                             "NETH" = "#003262",
+                             "NOR" = "#003262",
+                             "NZ" = "#003262",
+                             "SWE" = "#003262",
+                             "SWIZ" = "#003262",
+                             "UK" = "#003262",
+                             "US" = "#FDB515")) +
+  labs(
+    title = "The U.S.'s COVID-19 vaccination rate lags that of other high-income 
+    countries",
+    subtitle = "Percent of population fully vaccinated (as of most recent date available)",
+    x = "Country",
+    y = "Percent out of 100",
+  ) +
+  geom_text(aes(label = vaxx_rate_label), vjust = -1, size = 3.5)
+```
+<br>
+<br>
+
+```{r, include = FALSE}
+# practice 
+
+#ggplot(country_comp_vax_rate, aes (x = name, y = vaxx_rate)) + 
+#   ylim(0,100) +
+#   geom_col(fill = "#2E5984") +
+#   labs(
+#     title = "The U.S.’s COVID-19 vaccination rate lags that of other high-income countries",
+#     subtitle = "Percent of population fully vaccinated (as of most recent date available",
+#     x = "Country",
+#     y = "Percent out of 100",
+#   ) +
+#   geom_text(aes(label = vaxx_rate_label), vjust = -1, size = 3.5)
+```
+
+```{r, echo=FALSE}
+#table
+
+table_countries <- c("AUS",	"CAN",	"FRA",	"GER",	"NETH",	"NZ",	"NOR",	"SWE",
+"SWIZ",	"UK",	"US")
+
+second_row <- c("244",	"232",	"248", "245",	"203",	"256",	"269",	"252",	"292",	"219", "359")
+
+
+AUS <- 244
+CAN <- 232
+FRA <- 248
+GER <- 245
+NETH <- 203
+NZ <- 256
+NOR <-269
+SWE <- 252
+SWIZ <- 292
+UK <- 219
+US <- 359
+
+#"Days since vaccination effort began until 60% of population fully vaccinated"
+
+table1 <- data.frame(AUS,CAN,FRA,GER,NETH,NZ,NOR,SWE,SWIZ,UK,US)
+
+table1 %>%
+  gt() %>%
+  gt::tab_header(
+    title = md("**Days since vaccination effort began until 60% of population fully vaccinated**")
+  )
+```
+<br>
+<br>
+Data is current as of 4/23/22 for NETH; 4/28/22 for SWE, UK; 5/1/22 for CAN; 5/2/22 for FRA, GER, NOR, SWIZ, US; 5/3/22 for AUS, NZ.
